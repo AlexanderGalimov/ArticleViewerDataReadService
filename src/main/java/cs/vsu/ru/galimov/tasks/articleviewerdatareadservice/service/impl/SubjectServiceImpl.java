@@ -48,8 +48,8 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public List<Subject> findByAuthorsNamesContaining(String authorName) {
-        return subjectRepository.findByAuthorsNamesContaining(authorName);
+    public Subject findByTitle(String title) {
+        return subjectRepository.findByTitle(title);
     }
 
     @Override

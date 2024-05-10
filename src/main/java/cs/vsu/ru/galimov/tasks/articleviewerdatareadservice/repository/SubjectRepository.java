@@ -8,9 +8,9 @@ import java.util.List;
 
 @Repository
 public interface SubjectRepository extends Neo4jRepository<Subject, Long> {
-    List<Subject> findByAuthorsNamesContaining(String authorName);
-
     List<Subject> findByDepartmentMagazineName(String departmentMagazineName);
+
+    Subject findByTitle(String title);
 
     List<Subject> findByTitleContaining(String title);
 }

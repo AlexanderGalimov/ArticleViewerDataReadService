@@ -58,4 +58,14 @@ public class ArticleServiceImpl implements ArticleService {
     public Article findByPdfParamsTitle(String title) {
         return articleRepository.findByPdfParamsTitle(title);
     }
+
+    @Override
+    public List<Article> findByPdfParamsTitleContaining(String title) {
+        return articleRepository.findByPdfParamsTitleContaining(title);
+    }
+
+    @Override
+    public List<Article> findByFullTextContaining(String fullText) {
+        return articleRepository.findByFullTextContaining(fullText);
+    }
 }

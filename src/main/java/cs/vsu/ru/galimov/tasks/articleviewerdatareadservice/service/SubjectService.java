@@ -17,7 +17,7 @@ public interface SubjectService {
 
     void deleteSubject(Long id);
 
-    List<Subject> findByAuthorsNamesContaining(String authorName);
+    Subject findByTitle(String title);
 
     List<Subject> findByDepartmentMagazineName(String departmentMagazineName);
 

@@ -13,4 +13,8 @@ public interface ArticleRepository extends MongoRepository<Article, String> {
     Article findByUniqUIIDS3(String uniqUIIDS3);
 
     List<Article> findByAuthorIdsContaining(String authorId);
+
+    List<Article> findByPdfParamsTitleContaining(String title);
+
+    List<Article> findByFullTextContaining(String fullText);
 }

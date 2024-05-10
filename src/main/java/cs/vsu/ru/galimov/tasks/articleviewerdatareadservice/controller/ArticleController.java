@@ -1,6 +1,6 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.controller;
 
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.request.FilterRequestDTO;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.component.DataPreparer;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce.ArticleResponseDTO;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.mapper.ArticleMapper;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
@@ -16,18 +16,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/article")
+@Validated
 public class ArticleController {
 
     private final SubjectServiceImpl subjectService;
@@ -38,12 +44,15 @@ public class ArticleController {
 
     private final ArticleMapper mapper;
 
+    private final DataPreparer dataPreparer;
+
     @Autowired
-    public ArticleController(SubjectServiceImpl subjectService, ArticleServiceImpl articleService, AuthorServiceImpl authorService, ArticleMapper mapper) {
+    public ArticleController(SubjectServiceImpl subjectService, ArticleServiceImpl articleService, AuthorServiceImpl authorService, ArticleMapper mapper, DataPreparer dataPreparer) {
         this.subjectService = subjectService;
         this.articleService = articleService;
         this.authorService = authorService;
         this.mapper = mapper;
+        this.dataPreparer = dataPreparer;
     }
 
     @GetMapping("/findByTitleText")
@@ -59,19 +68,15 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> getArticlesByTitle(@RequestBody FilterRequestDTO filterRequestDTO) {
-        List<Subject> subjects = subjectService.findByTitleContaining(filterRequestDTO.getTitle());
-        List<ArticleResponseDTO> articleResponseDTOS = new ArrayList<>();
-        for (Subject subject : subjects) {
-            Article article = articleService.findByPdfParamsTitle(subject.getTitle());
-            articleResponseDTOS.add(mapper.toDto(article, subject.getAuthorsNames()));
-        }
+    public ResponseEntity<List<ArticleResponseDTO>> getArticlesByTitle(@RequestParam @Size(min = 3, max = 100) String title) {
+        List<Article> articles = articleService.findByPdfParamsTitleContaining(title);
+        List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
 
         return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
     }
 
     @GetMapping("/findByAuthorName")
-    @Operation(summary = "find Articles by title", description = "Find Article by title")
+    @Operation(summary = "find Articles by author", description = "Find Article by author")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
             @ApiResponse(responseCode = "404", description = "Articles not found",
@@ -83,16 +88,64 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> findByAuthorName(@RequestBody String authorName) {
-        List<Subject> subjects = subjectService.findByAuthorsNamesContaining(authorName);
-        List<ArticleResponseDTO> articleResponseDTOS = new ArrayList<>();
-        for (Subject subject : subjects) {
-            Article article = articleService.findByPdfParamsTitle(subject.getTitle());
-            articleResponseDTOS.add(mapper.toDto(article, subject.getAuthorsNames()));
+    public ResponseEntity<List<ArticleResponseDTO>> findByAuthorName(@RequestBody @Size(min = 3, max = 100) String authorName) {
+        List<Author> authors = authorService.findByNameContains(authorName);
+        List<Article> articles = new ArrayList<>();
+        for (Author author : authors) {
+            List<Article> currentAuthorArticles = articleService.findByAuthorIdsContaining(author.getId());
+            articles.addAll(currentAuthorArticles);
         }
+        List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
 
         return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
     }
 
+    @GetMapping("/findByText")
+    @Operation(summary = "find Articles by text", description = "Find Article by text")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Articles not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Articles not found"))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Internal server error")))
+    })
+    public ResponseEntity<List<ArticleResponseDTO>> findByText(@RequestBody @Size(min = 3, max = 100) String text) {
+        List<Article> articles = articleService.findByFullTextContaining(text);
+        List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
+
+        return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
+    }
+
+    @GetMapping("/findRelatedArticles")
+    @Operation(summary = "find related Articles by title", description = "Find related Articles by title")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Articles not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Articles not found"))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Internal server error")))
+    })
+    public ResponseEntity<List<ArticleResponseDTO>> findRelatedArticles(@RequestParam @Size(min = 3, max = 100) String title) {
+        Subject subject = subjectService.findByTitle(title);
+        Set<Subject> subjects;
+        subjects = subject.getRelatedSubjects();
+
+        List<Article> articles = new ArrayList<>();
+        for (Subject currentSubject : subjects) {
+            Article article = articleService.findByPdfParamsTitle(currentSubject.getTitle());
+            articles.add(article);
+        }
+        List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
+
+        return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
+    }
 }
 
