@@ -1,5 +1,6 @@
-package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception;
+package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.handler;
 
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleInternalException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

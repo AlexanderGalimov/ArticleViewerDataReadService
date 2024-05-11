@@ -9,6 +9,14 @@ import java.util.List;
 public class ArticleResponseDTO {
     private String title;
 
+    private String departmentMagazineName;
+
+    private String departmentMagazineUrl;
+
+    private String archiveInfo;
+
+    private String archiveLink;
+
     private List<String> authorsNames;
 
     private String pdfLink;

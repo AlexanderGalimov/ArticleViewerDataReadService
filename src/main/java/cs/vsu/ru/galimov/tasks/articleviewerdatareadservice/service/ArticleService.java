@@ -27,4 +27,6 @@ public interface ArticleService {
     List<Article> findByPdfParamsTitleContaining(String title);
 
     List<Article> findByFullTextContaining(String fullText);
+
+    List<Article> findByDepartmentMagazineNameContaining(String departmentMagazineName);
 }

@@ -2,7 +2,7 @@ package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.controller;
 
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.component.DataPreparer;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce.ArticleResponseDTO;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.mapper.ArticleMapper;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Author;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,16 +41,13 @@ public class ArticleController {
 
     private final AuthorServiceImpl authorService;
 
-    private final ArticleMapper mapper;
-
     private final DataPreparer dataPreparer;
 
     @Autowired
-    public ArticleController(SubjectServiceImpl subjectService, ArticleServiceImpl articleService, AuthorServiceImpl authorService, ArticleMapper mapper, DataPreparer dataPreparer) {
+    public ArticleController(SubjectServiceImpl subjectService, ArticleServiceImpl articleService, AuthorServiceImpl authorService, DataPreparer dataPreparer) {
         this.subjectService = subjectService;
         this.articleService = articleService;
         this.authorService = authorService;
-        this.mapper = mapper;
         this.dataPreparer = dataPreparer;
     }
 
@@ -59,7 +55,7 @@ public class ArticleController {
     @Operation(summary = "find Articles by title", description = "Find Article by title")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Articles not found",
+            @ApiResponse(responseCode = "204", description = "Articles not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Articles not found"))),
@@ -70,6 +66,9 @@ public class ArticleController {
     })
     public ResponseEntity<List<ArticleResponseDTO>> getArticlesByTitle(@RequestParam @Size(min = 3, max = 100) String title) {
         List<Article> articles = articleService.findByPdfParamsTitleContaining(title);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
 
         return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
@@ -79,7 +78,7 @@ public class ArticleController {
     @Operation(summary = "find Articles by author", description = "Find Article by author")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Articles not found",
+            @ApiResponse(responseCode = "204", description = "Articles not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Articles not found"))),
@@ -90,6 +89,9 @@ public class ArticleController {
     })
     public ResponseEntity<List<ArticleResponseDTO>> findByAuthorName(@RequestBody @Size(min = 3, max = 100) String authorName) {
         List<Author> authors = authorService.findByNameContains(authorName);
+        if (authors.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         List<Article> articles = new ArrayList<>();
         for (Author author : authors) {
             List<Article> currentAuthorArticles = articleService.findByAuthorIdsContaining(author.getId());
@@ -104,7 +106,7 @@ public class ArticleController {
     @Operation(summary = "find Articles by text", description = "Find Article by text")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Articles not found",
+            @ApiResponse(responseCode = "204", description = "Articles not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Articles not found"))),
@@ -115,6 +117,9 @@ public class ArticleController {
     })
     public ResponseEntity<List<ArticleResponseDTO>> findByText(@RequestBody @Size(min = 3, max = 100) String text) {
         List<Article> articles = articleService.findByFullTextContaining(text);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
 
         return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
@@ -124,7 +129,7 @@ public class ArticleController {
     @Operation(summary = "find related Articles by title", description = "Find related Articles by title")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Articles not found",
+            @ApiResponse(responseCode = "404", description = "Article not found",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Articles not found"))),
@@ -135,6 +140,9 @@ public class ArticleController {
     })
     public ResponseEntity<List<ArticleResponseDTO>> findRelatedArticles(@RequestParam @Size(min = 3, max = 100) String title) {
         Subject subject = subjectService.findByTitle(title);
+        if (subject == null) {
+            throw new NotFoundException("Article not found");
+        }
         Set<Subject> subjects;
         subjects = subject.getRelatedSubjects();
 
@@ -143,6 +151,30 @@ public class ArticleController {
             Article article = articleService.findByPdfParamsTitle(currentSubject.getTitle());
             articles.add(article);
         }
+        List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
+
+        return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
+    }
+
+    @GetMapping("/findArticlesByDepartmentMagazine")
+    @Operation(summary = "find related Articles by department magazine name", description = "Find related Articles by department magazine name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
+            @ApiResponse(responseCode = "204", description = "Articles not found",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Articles not found"))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = String.class),
+                            examples = @ExampleObject(value = "Internal server error")))
+    })
+    public ResponseEntity<List<ArticleResponseDTO>> findArticlesByDepartmentMagazine(@RequestParam @Size(min = 3, max = 100) String departmentMagazineName) {
+        List<Article> articles = articleService.findByDepartmentMagazineNameContaining(departmentMagazineName);
+        if (articles.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
         List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
 
         return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);

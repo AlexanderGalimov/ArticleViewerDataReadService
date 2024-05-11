@@ -1,5 +1,6 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl;
 
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.repository.ArticleRepository;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.ArticleService;
@@ -36,7 +37,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Article findById(String id) {
-        return articleRepository.findById(id).orElse(null);
+        return articleRepository.findById(id).orElseThrow(() -> new NotFoundException("Article not found with id: " + id));
     }
 
     @Override
@@ -67,5 +68,10 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> findByFullTextContaining(String fullText) {
         return articleRepository.findByFullTextContaining(fullText);
+    }
+
+    @Override
+    public List<Article> findByDepartmentMagazineNameContaining(String departmentMagazineName) {
+        return articleRepository.findByDepartmentMagazineNameContaining(departmentMagazineName);
     }
 }

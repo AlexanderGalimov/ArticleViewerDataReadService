@@ -1,5 +1,6 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl;
 
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.repository.SubjectRepository;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.SubjectService;
@@ -30,7 +31,7 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public Subject getSubjectById(Long id) {
-        return subjectRepository.findById(id).orElse(null);
+        return subjectRepository.findById(id).orElseThrow(() -> new NotFoundException("Subject not found with id: " + id));
     }
 
     @Override

@@ -17,4 +17,6 @@ public interface ArticleRepository extends MongoRepository<Article, String> {
     List<Article> findByPdfParamsTitleContaining(String title);
 
     List<Article> findByFullTextContaining(String fullText);
+
+    List<Article> findByDepartmentMagazineNameContaining(String departmentMagazineName);
 }

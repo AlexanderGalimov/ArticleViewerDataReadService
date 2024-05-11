@@ -1,5 +1,6 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl;
 
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Author;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.repository.AuthorRepository;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.AuthorService;
@@ -37,7 +38,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author findById(String id) {
-        return repository.findById(id).orElse(null);
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Author not found with id: " + id));
     }
 
     @Override

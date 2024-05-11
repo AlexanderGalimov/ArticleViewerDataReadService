@@ -4,7 +4,6 @@ import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce.Article
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.mapper.ArticleMapper;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.ArticleServiceImpl;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.SubjectServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,15 +14,12 @@ import java.util.List;
 @Component
 public class DataPreparer {
 
-    private final ArticleServiceImpl articleService;
-
     private final ArticleMapper mapper;
 
     private final SubjectServiceImpl subjectService;
 
     @Autowired
-    public DataPreparer(ArticleServiceImpl articleService, ArticleMapper mapper, SubjectServiceImpl subjectService) {
-        this.articleService = articleService;
+    public DataPreparer(ArticleMapper mapper, SubjectServiceImpl subjectService) {
         this.mapper = mapper;
         this.subjectService = subjectService;
     }
