@@ -64,7 +64,7 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> getArticlesByTitle(@RequestParam @Size(min = 3, max = 100) String title) {
+    public ResponseEntity<List<ArticleResponseDTO>> getArticlesByTitle(@RequestParam @Size(min = 3, max = 300) String title) {
         List<Article> articles = articleService.findByPdfParamsTitleContaining(title);
         if (articles.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -87,7 +87,7 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> findByAuthorName(@RequestBody @Size(min = 3, max = 100) String authorName) {
+    public ResponseEntity<List<ArticleResponseDTO>> findByAuthorName(@RequestBody @Size(min = 3, max = 300) String authorName) {
         List<Author> authors = authorService.findByNameContains(authorName);
         if (authors.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -115,7 +115,7 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> findByText(@RequestBody @Size(min = 3, max = 100) String text) {
+    public ResponseEntity<List<ArticleResponseDTO>> findByText(@RequestBody @Size(min = 3, max = 300) String text) {
         List<Article> articles = articleService.findByFullTextContaining(text);
         if (articles.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -138,7 +138,7 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> findRelatedArticles(@RequestParam @Size(min = 3, max = 100) String title) {
+    public ResponseEntity<List<ArticleResponseDTO>> findRelatedArticles(@RequestParam @Size(min = 3, max = 300) String title) {
         Subject subject = subjectService.findByTitle(title);
         if (subject == null) {
             throw new NotFoundException("Article not found");
@@ -157,7 +157,7 @@ public class ArticleController {
     }
 
     @GetMapping("/findArticlesByDepartmentMagazine")
-    @Operation(summary = "find related Articles by department magazine name", description = "Find related Articles by department magazine name")
+    @Operation(summary = "find Articles by department magazine name", description = "Find related Articles by department magazine name")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of articles retrieved successfully"),
             @ApiResponse(responseCode = "204", description = "Articles not found",
@@ -169,7 +169,7 @@ public class ArticleController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<ArticleResponseDTO>> findArticlesByDepartmentMagazine(@RequestParam @Size(min = 3, max = 100) String departmentMagazineName) {
+    public ResponseEntity<List<ArticleResponseDTO>> findArticlesByDepartmentMagazine(@RequestParam @Size(min = 3, max = 15) String departmentMagazineName) {
         List<Article> articles = articleService.findByDepartmentMagazineNameContaining(departmentMagazineName);
         if (articles.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

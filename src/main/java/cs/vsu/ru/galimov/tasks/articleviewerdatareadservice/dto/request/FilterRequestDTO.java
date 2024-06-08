@@ -13,7 +13,7 @@ import lombok.Data;
 public class FilterRequestDTO {
     @Schema(description = "Title", example = "title")
     @NotBlank(message = "Title of article cannot be blank")
-    @Size(min = 3, max = 100, message = "Title must be from 3 to 50")
+    @Size(min = 3, max = 300, message = "Title must be from 3 to 300")
     private String title;
 
     @Schema(description = "Department magazine name", example = "geograph")
