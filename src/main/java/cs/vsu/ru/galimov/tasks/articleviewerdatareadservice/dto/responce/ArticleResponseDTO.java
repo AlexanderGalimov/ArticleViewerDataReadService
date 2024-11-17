@@ -20,4 +20,8 @@ public class ArticleResponseDTO {
     private List<String> authorsNames;
 
     private String pdfLink;
+
+    private List<String> keywords;
+
+    private String annotation;
 }

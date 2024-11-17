@@ -2,12 +2,11 @@ package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.controller;
 
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.component.DataPreparer;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce.ArticleResponseDTO;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Author;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.ArticleServiceImpl;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.AuthorServiceImpl;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.RelatedArticleServiceImpl;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.SubjectServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/article")
@@ -43,12 +41,15 @@ public class ArticleController {
 
     private final DataPreparer dataPreparer;
 
+    private final RelatedArticleServiceImpl relatedArticleService;
+
     @Autowired
-    public ArticleController(SubjectServiceImpl subjectService, ArticleServiceImpl articleService, AuthorServiceImpl authorService, DataPreparer dataPreparer) {
+    public ArticleController(SubjectServiceImpl subjectService, ArticleServiceImpl articleService, AuthorServiceImpl authorService, DataPreparer dataPreparer, RelatedArticleServiceImpl relatedArticleService) {
         this.subjectService = subjectService;
         this.articleService = articleService;
         this.authorService = authorService;
         this.dataPreparer = dataPreparer;
+        this.relatedArticleService = relatedArticleService;
     }
 
     @GetMapping("/findByTitleText")
@@ -139,20 +140,7 @@ public class ArticleController {
                             examples = @ExampleObject(value = "Internal server error")))
     })
     public ResponseEntity<List<ArticleResponseDTO>> findRelatedArticles(@RequestParam @Size(min = 3, max = 300) String title) {
-        Subject subject = subjectService.findByTitle(title);
-        if (subject == null) {
-            throw new NotFoundException("Article not found");
-        }
-        Set<Subject> subjects;
-        subjects = subject.getRelatedSubjects();
-
-        List<Article> articles = new ArrayList<>();
-        for (Subject currentSubject : subjects) {
-            Article article = articleService.findByPdfParamsTitle(currentSubject.getTitle());
-            articles.add(article);
-        }
-        List<ArticleResponseDTO> articleResponseDTOS = dataPreparer.articlesToDTO(articles);
-
+        List<ArticleResponseDTO> articleResponseDTOS = relatedArticleService.findRelatedArticles(title);
         return new ResponseEntity<>(articleResponseDTOS, HttpStatus.OK);
     }
 
