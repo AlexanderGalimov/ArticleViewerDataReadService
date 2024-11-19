@@ -1,6 +1,5 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce;
 
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Author;
 import lombok.Data;
 
 import java.util.List;

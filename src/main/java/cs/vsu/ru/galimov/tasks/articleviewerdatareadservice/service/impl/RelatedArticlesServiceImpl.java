@@ -1,12 +1,11 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl;
 
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.component.DataPreparer;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.component.ArticleDataPreparer;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce.ArticleResponseDTO;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundException;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.ArticleService;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.RelatedArticleService;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.RelatedArticlesService;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,24 +15,24 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class RelatedArticleServiceImpl implements RelatedArticleService {
+public class RelatedArticlesServiceImpl implements RelatedArticlesService {
 
     private final SubjectService subjectService;
-    private final ArticleService articleService;
-    private final DataPreparer dataPreparer;
+    private final ArticleServiceImpl articleService;
+    private final ArticleDataPreparer articleDataPreparer;
 
     @Autowired
-    public RelatedArticleServiceImpl(SubjectService subjectService, ArticleService articleService, DataPreparer dataPreparer) {
+    public RelatedArticlesServiceImpl(SubjectService subjectService, ArticleServiceImpl articleService, ArticleDataPreparer articleDataPreparer) {
         this.subjectService = subjectService;
         this.articleService = articleService;
-        this.dataPreparer = dataPreparer;
+        this.articleDataPreparer = articleDataPreparer;
     }
 
     @Override
     public List<ArticleResponseDTO> findRelatedArticles(String title) {
         Subject subject = subjectService.findByTitle(title);
         if (subject == null) {
-            throw new NotFoundException("Article not found");
+            throw new NotFoundException("Article with given title not found");
         }
         Set<Subject> subjects = subject.getRelatedSubjects();
 
@@ -42,7 +41,7 @@ public class RelatedArticleServiceImpl implements RelatedArticleService {
             Article article = articleService.findByPdfParamsTitle(currentSubject.getTitle());
             articles.add(article);
         }
-        return dataPreparer.articlesToDTO(articles);
+        return articleDataPreparer.articlesToDTO(articles);
     }
 }
 
