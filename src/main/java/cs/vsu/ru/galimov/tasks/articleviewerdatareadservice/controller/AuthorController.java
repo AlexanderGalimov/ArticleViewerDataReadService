@@ -30,8 +30,8 @@ public class AuthorController {
         this.authorSearchService = authorSearchService;
     }
 
-    @GetMapping("/findByDepartmentMagazine")
-    @Operation(summary = "Find Authors by department magazine", description = "Find Authors by department magazine")
+    @GetMapping("/findAll")
+    @Operation(summary = "Find all Authorse", description = "Find all Authors")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of authors retrieved successfully"),
             @ApiResponse(responseCode = "204", description = "Authors not found",
@@ -43,7 +43,7 @@ public class AuthorController {
                             schema = @Schema(implementation = String.class),
                             examples = @ExampleObject(value = "Internal server error")))
     })
-    public ResponseEntity<List<AuthorResponseDTO>> getAuthorsByDepartmentMagazineName() {
+    public ResponseEntity<List<AuthorResponseDTO>> getAllAuthors() {
         List<AuthorResponseDTO> authorResponseDTOS = authorSearchService.findAllAuthors();
         return new ResponseEntity<>(authorResponseDTOS, HttpStatus.OK);
     }
