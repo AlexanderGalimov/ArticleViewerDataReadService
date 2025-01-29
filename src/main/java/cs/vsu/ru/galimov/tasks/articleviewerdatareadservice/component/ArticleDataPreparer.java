@@ -2,10 +2,10 @@ package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.component;
 
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.dto.responce.ArticleResponseDTO;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.mapper.ArticleMapper;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.mapper.AuthorMapper;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
-import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.SubjectServiceImpl;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Author;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.ArticleServiceImpl;
+import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.AuthorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,27 +17,34 @@ public class ArticleDataPreparer {
 
     private final ArticleMapper articleMapper;
 
-    private final AuthorMapper authorMapper;
+    private final ArticleServiceImpl articleService;
 
-    private final SubjectServiceImpl subjectService;
+    private final AuthorServiceImpl authorService;
+
 
     @Autowired
-    public ArticleDataPreparer(ArticleMapper articleMapper, AuthorMapper authorMapper, SubjectServiceImpl subjectService) {
+    public ArticleDataPreparer(ArticleMapper articleMapper, ArticleServiceImpl articleService, AuthorServiceImpl authorService) {
         this.articleMapper = articleMapper;
-        this.authorMapper = authorMapper;
-        this.subjectService = subjectService;
+        this.articleService = articleService;
+        this.authorService = authorService;
     }
 
     public List<ArticleResponseDTO> articlesToDTO(List<Article> articles) {
         List<ArticleResponseDTO> articleResponseDTOS = new ArrayList<>();
         for (Article article : articles) {
-            articleResponseDTOS.add(articleMapper.toDto(article, getAuthorsNames(article.getPdfParams().getTitle())));
+            articleResponseDTOS.add(articleMapper.toDto(article, findAuthorsNames(article.getPdfParams().getTitle())));
         }
         return articleResponseDTOS;
     }
 
-    public List<String> getAuthorsNames(String articleTitle) {
-        Subject subject = subjectService.findByTitle(articleTitle);
-        return subject.getAuthorsNames();
+    private List<String> findAuthorsNames(String title){
+        Article article = articleService.findByPdfParamsTitle(title);
+        List<String> authorsNames = new ArrayList<>();
+        List<String> ids = article.getAuthorIds();
+        for (String id: ids) {
+            Author author = authorService.findById(id);
+            authorsNames.add(author.getName());
+        }
+        return authorsNames;
     }
 }

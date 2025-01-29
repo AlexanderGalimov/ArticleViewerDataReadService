@@ -11,5 +11,7 @@ public class ArticleViewerDataReadServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ArticleViewerDataReadServiceApplication.class, args);
+
+
     }
 }

@@ -17,6 +17,8 @@ public class ArticleMapper {
         articleResponseDTO.setArchiveLink(article.getDateArchive().getLink());
         articleResponseDTO.setAuthorsNames(authorsNames);
         articleResponseDTO.setPdfLink(article.getPdfParams().getLink());
+        articleResponseDTO.setAnnotation(article.getAnnotation());
+        articleResponseDTO.setKeywords(article.getKeywords());
         return articleResponseDTO;
     }
 }
