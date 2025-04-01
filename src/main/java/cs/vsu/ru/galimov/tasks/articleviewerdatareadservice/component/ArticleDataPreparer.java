@@ -6,12 +6,13 @@ import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Author;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.ArticleServiceImpl;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.AuthorServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Component
 public class ArticleDataPreparer {
 
@@ -20,14 +21,6 @@ public class ArticleDataPreparer {
     private final ArticleServiceImpl articleService;
 
     private final AuthorServiceImpl authorService;
-
-
-    @Autowired
-    public ArticleDataPreparer(ArticleMapper articleMapper, ArticleServiceImpl articleService, AuthorServiceImpl authorService) {
-        this.articleMapper = articleMapper;
-        this.articleService = articleService;
-        this.authorService = authorService;
-    }
 
     public List<ArticleResponseDTO> articlesToDTO(List<Article> articles) {
         List<ArticleResponseDTO> articleResponseDTOS = new ArrayList<>();

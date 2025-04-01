@@ -11,6 +11,7 @@ import lombok.Data;
 @JsonSerialize
 @JsonDeserialize
 public class FilterRequestDTO {
+
     @Schema(description = "Title", example = "title")
     @NotBlank(message = "Title of article cannot be blank")
     @Size(min = 3, max = 300, message = "Title must be from 3 to 300")

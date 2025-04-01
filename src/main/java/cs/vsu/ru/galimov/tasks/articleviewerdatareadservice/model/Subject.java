@@ -1,19 +1,21 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model;
 
-
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Node("Subject")
 public class Subject {
     @Id
@@ -28,20 +30,4 @@ public class Subject {
 
     @Relationship(type = "RELATED_TO")
     private Set<Subject> relatedSubjects;
-
-    public Subject(String title, List<String> authorsNames, String departmentMagazineName) {
-        this.title = title;
-        this.authorsNames = authorsNames;
-        this.departmentMagazineName = departmentMagazineName;
-    }
-
-    public Subject() {
-    }
-
-    public void addRelatedSubject(Subject subject) {
-        if (relatedSubjects == null) {
-            relatedSubjects = new HashSet<>();
-        }
-        relatedSubjects.add(subject);
-    }
 }

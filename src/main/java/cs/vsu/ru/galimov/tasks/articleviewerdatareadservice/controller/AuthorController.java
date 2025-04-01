@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/author")
 @Validated
@@ -25,13 +26,8 @@ public class AuthorController {
 
     private final AuthorSearchServiceImpl authorSearchService;
 
-    @Autowired
-    public AuthorController(AuthorSearchServiceImpl authorSearchService) {
-        this.authorSearchService = authorSearchService;
-    }
-
     @GetMapping("/findAll")
-    @Operation(summary = "Find all Authorse", description = "Find all Authors")
+    @Operation(summary = "Find all Authors", description = "Find all Authors")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "List of authors retrieved successfully"),
             @ApiResponse(responseCode = "204", description = "Authors not found",
@@ -47,6 +43,4 @@ public class AuthorController {
         List<AuthorResponseDTO> authorResponseDTOS = authorSearchService.findAllAuthors();
         return new ResponseEntity<>(authorResponseDTOS, HttpStatus.OK);
     }
-
-
 }

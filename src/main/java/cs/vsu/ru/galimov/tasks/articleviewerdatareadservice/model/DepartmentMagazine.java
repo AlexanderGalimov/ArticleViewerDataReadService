@@ -1,21 +1,16 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class DepartmentMagazine {
     private String name;
 
     private String url;
 
     private String type;
-
-    public DepartmentMagazine(String name, String url, String type) {
-        this.name = name;
-        this.url = url;
-        this.type = type;
-    }
-
-    public DepartmentMagazine() {
-    }
 }

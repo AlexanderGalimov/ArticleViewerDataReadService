@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: ArticleViewerDataReadService
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: 185206
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: CourseworkDB
+  elasticsearch:
+    uris: http://localhost:9200
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+minio:
+  url: http://127.0.0.1:9000
+  access-key: alexander
+  secret-key: 18520655Minio
+  bucket-name: my-bucket
+
+logging:
+  level:
+    org.springframework.data.mongodb.core: DEBUG
+    org.springframework.data.elasticsearch: DEBUG

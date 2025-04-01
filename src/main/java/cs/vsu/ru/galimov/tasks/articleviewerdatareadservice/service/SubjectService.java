@@ -1,11 +1,9 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service;
 
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Subject;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public interface SubjectService {
     Subject createSubject(Subject subject);
 

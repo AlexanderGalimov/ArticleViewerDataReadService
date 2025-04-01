@@ -5,7 +5,12 @@ import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.exception.NotFoundEx
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.minio.MinioTemplate;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.ArticleSearchServiceImpl;
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service.impl.RelatedArticlesServiceImpl;
-import io.minio.errors.*;
+import io.minio.errors.ErrorResponseException;
+import io.minio.errors.InsufficientDataException;
+import io.minio.errors.InternalException;
+import io.minio.errors.InvalidResponseException;
+import io.minio.errors.ServerException;
+import io.minio.errors.XmlParserException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -14,11 +19,15 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.Size;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -26,6 +35,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/article")
 @Validated
 public class ArticleController {
@@ -35,13 +45,6 @@ public class ArticleController {
     private final ArticleSearchServiceImpl articleSearchService;
 
     private final MinioTemplate template;
-
-    @Autowired
-    public ArticleController(RelatedArticlesServiceImpl relatedArticleService, ArticleSearchServiceImpl articleSearchService, MinioTemplate template) {
-        this.relatedArticleService = relatedArticleService;
-        this.articleSearchService = articleSearchService;
-        this.template = template;
-    }
 
     @GetMapping("/findByTitleText")
     @Operation(summary = "find Articles by title", description = "Find Article by title")

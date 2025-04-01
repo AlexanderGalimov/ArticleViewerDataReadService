@@ -1,6 +1,7 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.config;
 
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.SearchDocument;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -8,12 +9,10 @@ import org.springframework.data.elasticsearch.core.IndexOperations;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 
 @Configuration
+@RequiredArgsConstructor
 public class ElasticsearchConfig {
-    private final ElasticsearchOperations elasticsearchOperations;
 
-    public ElasticsearchConfig(ElasticsearchOperations elasticsearchOperations) {
-        this.elasticsearchOperations = elasticsearchOperations;
-    }
+    private final ElasticsearchOperations elasticsearchOperations;
 
     @Bean
     public IndexOperations createIndexIfNotExists() {

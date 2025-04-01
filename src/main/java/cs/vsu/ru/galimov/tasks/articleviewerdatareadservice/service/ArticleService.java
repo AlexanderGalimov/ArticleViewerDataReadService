@@ -1,12 +1,9 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.service;
 
-
 import cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model.Article;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Component
 public interface ArticleService {
     Article insert(Article article);
 

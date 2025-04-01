@@ -1,12 +1,16 @@
 package cs.vsu.ru.galimov.tasks.articleviewerdatareadservice.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Document(collection = "Articles")
 public class Article {
     @Id
@@ -37,9 +41,6 @@ public class Article {
         this.departmentMagazine = departmentMagazine;
         this.dateArchive = dateArchive;
         this.pdfParams = pdfParams;
-    }
-
-    public Article() {
     }
 }
 
